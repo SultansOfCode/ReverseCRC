@@ -161,7 +161,15 @@ PetiteVue.createApp({
   mounted() {
     window.vueApp = this;
 
-    if (Module === void 0 || Module === null) {
+    if (window.Module === void 0 || window.Module === null) {
+      return;
+    }
+
+    if (window.Module.cGenerateAscii === void 0 || window.Module.cGenerateAscii === null) {
+      return;
+    }
+
+    if (window.Module.cGenerateBinary === void 0 || window.Module.cGenerateBinary === null) {
       return;
     }
 
