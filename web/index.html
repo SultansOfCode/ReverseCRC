@@ -7,7 +7,7 @@
   </head>
 
   <body>
-    <div id="app" v-on:vue:mounted="mounted" v-cloak>
+    <div id="app" v-cloak>
       Everything is client side. Nothing is uploaded to or downloaded from the server<br />
 
       <br />
@@ -34,17 +34,14 @@
     <script type="text/javascript">
       var Module = {
         onRuntimeInitialized() {
-          if (window.vueApp === void 0 || window.vueApp === null) {
-            return;
-          }
-
-          window.vueApp.initialize();
+          initializeApp();
         }
       };
     </script>
 
-    <script src="reversecrc.js"></script>
     <script src="https://unpkg.com/petite-vue"></script>
     <script src="index.js"></script>
+
+    <script src="reversecrc.js"></script>
   </body>
 </html>
