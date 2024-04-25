@@ -2,6 +2,6 @@
   display: none;
 }
 
-input[type="file"] {
+input[type="file"].hidden {
   display: none;
 }

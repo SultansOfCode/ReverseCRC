@@ -12,22 +12,41 @@
 
       <br />
 
-      Current CRC32: <input type="text" v-model="startCrc" v-on:input="calculated = false" /><br />
+      <div>
+        Current CRC32: <input type="text" v-model="startCRC" v-on:input="calculated = false" /><br />
 
-      Wanted CRC32: <input type="text" v-model="wantedCrc" v-on:input="calculated = false"/><br />
+        Wanted CRC32: <input type="text" v-model="wantedCRC" v-on:input="calculated = false"/><br />
 
-      <button v-on:click="generateCrc">Calculate</button><br />
+        <button v-on:click="generateCRC">Calculate</button><br />
+
+        <br />
+
+        <div v-if="calculated === true">
+          ASCII: {{ patchAsciiString }}<br />
+
+          Binary: {{ patchBinaryString }}<br />
+
+          <button v-on:click="patchFileManually('ascii')">Patch file with ASCII</button>
+
+          <button v-on:click="patchFileManually('binary')">Patch file with binary</button>
+        </div>
+      </div>
+
+      <hr />
 
       <br />
 
-      <div v-if="calculated === true">
-        ASCII: {{ patchAsciiString }}<br />
+      <div>
+        File to be patched: <input type="file" ref="baseFile" v-model="baseFilePath" />
 
-        Binary: {{ patchBinaryString }}<br />
+        <br />
 
-        <button v-on:click="patchFile('ascii')">Patch file with ascii</button>
+        Target file with desired CRC32: <input type="file" ref="targetFile" v-model="targetFilePath" />
 
-        <button v-on:click="patchFile('binary')">Patch file with binary</button>
+        <br />
+
+        <button v-if="filesToPatch === true" v-on:click="patchFiles('ascii')">Patch file with ASCII</button>
+        <button v-if="filesToPatch === true" v-on:click="patchFiles('binary')">Patch file with binary</button>
       </div>
     </div>
 
@@ -39,6 +58,7 @@
       };
     </script>
 
+    <script src="https://unpkg.com/crc-32"></script>
     <script src="https://unpkg.com/petite-vue"></script>
     <script src="index.js"></script>
 

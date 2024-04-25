@@ -3,8 +3,10 @@
 function initializeApp() {
   PetiteVue.createApp({
     calculated: false,
-    startCrc: 0,
-    wantedCrc: 0,
+    startCRC: 0,
+    wantedCRC: 0,
+    baseFilePath: null,
+    targetFilePath: null,
     cGenerateAscii: Module.generateAscii,
     cGenerateBinary: Module.generateBinary,
     get patchAsciiSuccess() {
@@ -63,33 +65,81 @@ function initializeApp() {
         .map(value => `0x${value.toString(16).padStart(2, "0")}`)
         .join(" ");
     },
-    generateAscii(startCrc, wantedCrc) {
+    get filesToPatch() {
+      return (this.baseFilePath !== null && this.targetFilePath !== null);
+    },
+    generateAscii(startCRC, wantedCRC) {
       if (this.cGenerateAscii === null) {
         return [];
       }
 
-      return this.cGenerateAscii(startCrc, wantedCrc);
+      return this.cGenerateAscii(startCRC, wantedCRC);
     },
-    generateBinary(startCrc, wantedCrc) {
+    generateBinary(startCRC, wantedCRC) {
       if (this.generateBinary === null) {
         return [];
       }
 
-      return this.cGenerateBinary(startCrc, wantedCrc);
+      return this.cGenerateBinary(startCRC, wantedCRC);
     },
-    generateCrc() {
-      const startCrc = parseInt(this.startCrc, 16);
-      const wantedCrc = parseInt(this.wantedCrc, 16);
+    generateCRC() {
+      const startCRC = parseInt(this.startCRC, 16);
+      const wantedCRC = parseInt(this.wantedCRC, 16);
 
-      const patchAscii = this.generateAscii(startCrc, wantedCrc);
-      const patchBinary = this.generateBinary(startCrc, wantedCrc);
+      const patchAscii = this.generateAscii(startCRC, wantedCRC);
+      const patchBinary = this.generateBinary(startCRC, wantedCRC);
 
       this.patchAscii = patchAscii;
       this.patchBinary = patchBinary;
 
       this.calculated = true;
     },
-    patchFile(patchType) {
+    readFile(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = event => {
+          const data = new Uint8Array(event.target.result);
+
+          resolve(data);
+        };
+
+        reader.onerror = error => {
+          reject(error);
+        };
+
+        reader.readAsArrayBuffer(file);
+      })
+    },
+    downloadFile(blob, fileName) {
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+
+      a.href = url;
+      a.download = fileName;
+
+      document.body.appendChild(a);
+
+      a.click();
+
+      a.remove();
+
+      window.URL.revokeObjectURL(url);
+    },
+    patchFile(originalData, patchData, fileName) {
+      const patched = new Uint8Array(originalData.length + patchData.length);
+
+      patched.set(originalData, 0);
+      patched.set(patchData, originalData.length);
+
+      const blob = new Blob([patched], {
+        type: "application/octet-stream"
+      });
+
+      this.downloadFile(blob, fileName);
+    },
+    patchFileManually(patchType) {
       if (this.calculated === false) {
         return;
       }
@@ -101,8 +151,9 @@ function initializeApp() {
       const fileInput = document.createElement("input");
 
       fileInput.type = "file";
+      fileInput.classList.toggle("hidden");
 
-      fileInput.onchange = event => {
+      fileInput.onchange = async event => {
         const file = event.target.files[0];
         const fileTokens = file.name.split(".");
         const fileName = (fileTokens.length > 1 ? fileTokens.slice(0, fileTokens.length - 1) : fileTokens[0]);
@@ -114,42 +165,60 @@ function initializeApp() {
           return;
         }
 
-        const reader = new FileReader();
+        const data = await this.readFile(file).catch(() => null);
 
-        reader.onload = event => {
-          const data = new Uint8Array(event.target.result);
-          const patch = new Uint8Array(patchType === "ascii" ? this.patchAscii : this.patchBinary);
-          const patched = new Uint8Array(data.length + patch.length);
-
-          patched.set(data, 0);
-          patched.set(patch, data.length);
-
-          const blob = new Blob([patched], {
-            type: "application/octet-stream"
-          });
-
-          const url = window.URL.createObjectURL(blob);
-
-          const a = document.createElement("a");
-
-          a.href = url;
-          a.download = `${fileName}_patched${fileExtension}`;
-
-          document.body.appendChild(a);
-
-          a.click();
-
-          a.remove();
-
-          window.URL.revokeObjectURL(url);
+        if (data === null) {
+          return;
         }
 
-        reader.readAsArrayBuffer(file);
+        const patch = new Uint8Array(patchType === "ascii" ? this.patchAscii : this.patchBinary);
+        const patchedFileName = `${fileName}_patched${fileExtension}`;
+
+        this.patchFile(data, patch, patchedFileName);
       };
 
       document.body.appendChild(fileInput);
 
       fileInput.click();
+    },
+    async patchFiles(patchType) {
+      if (this.baseFilePath === null || this.targetFilePath === null) {
+        return;
+      }
+
+      if (this.$refs.baseFile.files.length === 0) {
+        return;
+      }
+
+      if (this.$refs.targetFile.files.length === 0) {
+        return;
+      }
+
+      if (["ascii", "binary"].includes(patchType) === false) {
+        return;
+      }
+
+      const baseFile = this.$refs.baseFile.files[0];
+      const targetFile = this.$refs.targetFile.files[0];
+
+      const baseFileData = await this.readFile(baseFile).catch(() => null);
+      const targetFileData = await this.readFile(targetFile).catch(() => null);
+
+      if (baseFileData === null || targetFileData === null) {
+        return;
+      }
+
+      const startCRC = CRC32.buf(baseFileData);
+      const wantedCRC = CRC32.buf(targetFileData);
+
+      const fileTokens = baseFile.name.split(".");
+      const fileName = (fileTokens.length > 1 ? fileTokens.slice(0, fileTokens.length - 1) : fileTokens[0]);
+      const fileExtension = (fileTokens.length > 1 ? `.${fileTokens[fileTokens.length - 1]}` : "");
+      const patchedFileName = `${fileName}_patched${fileExtension}`;
+
+      const patch = new Uint8Array(patchType === "ascii" ? this.cGenerateAscii(startCRC, wantedCRC) : this.cGenerateBinary(startCRC, wantedCRC));
+
+      this.patchFile(baseFileData, patch, patchedFileName);
     }
   })
   .mount("#app");
