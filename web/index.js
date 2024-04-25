@@ -208,8 +208,8 @@ function initializeApp() {
         return;
       }
 
-      const startCRC = CRC32.buf(baseFileData);
-      const wantedCRC = CRC32.buf(targetFileData);
+      const startCRC = (CRC32.buf(baseFileData) >>> 0);
+      const wantedCRC = (CRC32.buf(targetFileData) >>> 0);
 
       const fileTokens = baseFile.name.split(".");
       const fileName = (fileTokens.length > 1 ? fileTokens.slice(0, fileTokens.length - 1) : fileTokens[0]);
