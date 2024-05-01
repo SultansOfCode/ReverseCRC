@@ -1,5 +1,38 @@
 "use strict";
 
+function findPattern(data, pattern, startIndex = 0) {
+  pattern = new Uint8Array(
+    Array.isArray(pattern) === true ?
+    pattern.map(value => Number.isInteger(value) === true ? value : value.charCodeAt(0)) :
+    pattern
+      .split("")
+      .map(value => value.charCodeAt(0))
+  );
+
+  let dataIndex = startIndex;
+  let patternIndex = 0;
+
+  while (dataIndex < data.length) {
+    const dataByte = data[dataIndex];
+    const patternByte = pattern[patternIndex];
+
+    if (dataByte === patternByte || patternByte === 0x3F) {
+      ++patternIndex;
+
+      if (patternIndex === pattern.length) {
+        return dataIndex - pattern.length + 1;
+      }
+    }
+    else {
+      patternIndex = 0;
+    }
+
+    ++dataIndex;
+  }
+
+  return -1;
+}
+
 function initializeApp() {
   PetiteVue.createApp({
     calculated: false,
@@ -7,6 +40,11 @@ function initializeApp() {
     wantedCRC: 0,
     baseFilePath: null,
     targetFilePath: null,
+    checksumsData: null,
+    clientOptions: {
+      allowMultiClient: false,
+      zoomHack: false
+    },
     cGenerateAscii: Module.generateAscii,
     cGenerateBinary: Module.generateBinary,
     get patchAsciiSuccess() {
@@ -219,6 +257,128 @@ function initializeApp() {
       const patch = new Uint8Array(patchType === "ascii" ? this.cGenerateAscii(startCRC, wantedCRC) : this.cGenerateBinary(startCRC, wantedCRC));
 
       this.patchFile(baseFileData, patch, patchedFileName);
+    },
+    corsProxyFetch(url) {
+      return fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
+    },
+    downloadWagonSound() {
+      if (this.checksumsData === null) {
+        return;
+      }
+
+      const originalChecksum = (this.checksumsData?.files["/sounds/wagon_sound.bnk"] ?? null);
+
+      if (originalChecksum === null) {
+        return;
+      }
+
+      const patch = new Uint8Array(this.cGenerateBinary(DUMMY_WAGON_SOUND_DLL_CRC32, (parseInt(originalChecksum, 16) >>> 0)));
+
+      this.patchFile(DUMMY_WAGON_SOUND_DLL, patch, "wagon_sound.bnk");
+    },
+    async downloadRavendawnDx() {
+      if (this.checksumsData === null) {
+        return;
+      }
+
+      const originalChecksum = (this.checksumsData?.binary?.checksum ?? null);
+
+      if (originalChecksum === null) {
+        return;
+      }
+
+      const clientData = await this.corsProxyFetch("https://dw.ravendawn.online/production/ravendawn_dx.exe")
+        .then(response => response.blob())
+        .then(blob => blob.arrayBuffer())
+        .then(buffer => new Uint8Array(buffer))
+        .catch(() => null);
+
+      if (clientData === null) {
+        return;
+      }
+
+      if (this.clientOptions.allowMultiClient === true) {
+        const index = findPattern(clientData, [0xFF, 0x15, "?", "?", "?", "?", 0xFF, 0x15, "?", "?", "?", "?", 0x3D, 0xB7, 0x00, 0x00, 0x00, 0x0F, 0x85, "?", "?", "?", "?"]);
+
+        if (index > -1) {
+          clientData[index + 13] = 0x28;
+        }
+      }
+
+      if (this.clientOptions.zoomHack === true) {
+        const index = findPattern(clientData, "\x4C\x8B\xD1\xC6\x81?????\x8B\x02\x89\x41?\x8B\x42?\x89\x41?\x44\x8B\x02\x44\x8B\x4A?");
+
+        if (index > -1) {
+          const codeCaveIndex = findPattern(clientData, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], index);
+
+          if (codeCaveIndex > -1) {
+            const diffGo = codeCaveIndex - index - 5;
+            const diffBack = index - codeCaveIndex - 28 + 5;
+
+            clientData[index + 0] = 0xE9;
+            clientData[index + 1] = (diffGo >>  0) & 0xFF;
+            clientData[index + 2] = (diffGo >>  8) & 0xFF;
+            clientData[index + 3] = (diffGo >> 16) & 0xFF;
+            clientData[index + 4] = (diffGo >> 24) & 0xFF;
+            clientData[index + 5] = 0x90;
+            clientData[index + 6] = 0x90;
+            clientData[index + 7] = 0x90;
+            clientData[index + 8] = 0x90;
+            clientData[index + 9] = 0x90;
+
+            clientData[codeCaveIndex +  0] = 0xC7;
+            clientData[codeCaveIndex +  1] = 0x02;
+            clientData[codeCaveIndex +  2] = 0x29;
+            clientData[codeCaveIndex +  3] = 0x00;
+            clientData[codeCaveIndex +  4] = 0x00;
+            clientData[codeCaveIndex +  5] = 0x00;
+
+            clientData[codeCaveIndex +  6] = 0xC7;
+            clientData[codeCaveIndex +  7] = 0x42;
+            clientData[codeCaveIndex +  8] = 0x04;
+            clientData[codeCaveIndex +  9] = 0x1D;
+            clientData[codeCaveIndex + 10] = 0x00;
+            clientData[codeCaveIndex + 11] = 0x00;
+            clientData[codeCaveIndex + 12] = 0x00;
+
+            clientData[codeCaveIndex + 13] = 0x49;
+            clientData[codeCaveIndex + 14] = 0x89;
+            clientData[codeCaveIndex + 15] = 0xCA;
+
+            clientData[codeCaveIndex + 16] = 0xC6;
+            clientData[codeCaveIndex + 17] = 0x81;
+            clientData[codeCaveIndex + 18] = 0x92;
+            clientData[codeCaveIndex + 19] = 0x00;
+            clientData[codeCaveIndex + 20] = 0x00;
+            clientData[codeCaveIndex + 21] = 0x00;
+            clientData[codeCaveIndex + 22] = 0x01;
+
+            clientData[codeCaveIndex + 23] = 0xE9;
+            clientData[codeCaveIndex + 24] = (diffBack >>  0) & 0xFF;
+            clientData[codeCaveIndex + 25] = (diffBack >>  8) & 0xFF;
+            clientData[codeCaveIndex + 26] = (diffBack >> 16) & 0xFF;
+            clientData[codeCaveIndex + 27] = (diffBack >> 24) & 0xFF;
+          }
+          else {
+            console.log("[ZOOM HACK] Code cave failed");
+          }
+        }
+        else {
+          console.log("[ZOOM HACK] Address failed");
+        }
+      }
+
+      const startCRC = (CRC32.buf(clientData) >>> 0);
+      const targetCRC = (parseInt(originalChecksum, 16) >>> 0);
+
+      const patch = new Uint8Array(this.cGenerateBinary(startCRC, targetCRC));
+
+      this.patchFile(clientData, patch, "ravendawn_dx.exe");
+    },
+    async mounted() {
+      this.checksumsData = await this.corsProxyFetch("https://dw.ravendawn.online/production/checksums.txt")
+        .then(response => response.json())
+        .catch(() => null);
     }
   })
   .mount("#app");

@@ -1,52 +1,135 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta name="referrer" content="no-referrer" />
+
     <title>ReverseCRC Web</title>
 
     <link rel="stylesheet" type="text/css" href="index.css" />
   </head>
 
   <body>
-    <div id="app" v-cloak>
+    <div id="app" v-on:vue:mounted="mounted" v-cloak>
       Everything is client side. Nothing is uploaded to or downloaded from the server<br />
 
       <br />
 
       <div>
-        Current CRC32: <input type="text" v-model="startCRC" v-on:input="calculated = false" /><br />
+        <h3>
+          Calculate CRC32
+        </h3>
 
-        Wanted CRC32: <input type="text" v-model="wantedCRC" v-on:input="calculated = false"/><br />
+        Current CRC32:
 
-        <button v-on:click="generateCRC">Calculate</button><br />
+        <input type="text" v-model="startCRC" v-on:input="calculated = false" />
+
+        <br />
+
+        Wanted CRC32:
+
+        <input type="text" v-model="wantedCRC" v-on:input="calculated = false"/>
+
+        <br />
+
+        <button v-on:click="generateCRC">
+          Calculate
+        </button>
+
+        <br />
 
         <br />
 
         <div v-if="calculated === true">
-          ASCII: {{ patchAsciiString }}<br />
+          ASCII: {{ patchAsciiString }}
 
-          Binary: {{ patchBinaryString }}<br />
+          <br />
 
-          <button v-on:click="patchFileManually('ascii')">Patch file with ASCII</button>
+          Binary: {{ patchBinaryString }}
 
-          <button v-on:click="patchFileManually('binary')">Patch file with binary</button>
+          <br />
+
+          <button v-on:click="patchFileManually('ascii')">
+            Patch file with ASCII
+          </button>
+
+          <button v-on:click="patchFileManually('binary')">
+            Patch file with binary
+          </button>
+
+          <br />
+
+          <br />
         </div>
       </div>
 
       <hr />
 
+      <div>
+        <h3>
+          Patch files
+        </h3>
+
+        File to be patched:
+
+        <input type="file" ref="baseFile" v-model="baseFilePath" />
+
+        <br />
+
+        Target file with desired CRC32:
+
+        <input type="file" ref="targetFile" v-model="targetFilePath" />
+
+        <br />
+
+        <button v-if="filesToPatch === true" v-on:click="patchFiles('ascii')">
+          Patch file with ASCII
+        </button>
+
+        <button v-if="filesToPatch === true" v-on:click="patchFiles('binary')">
+          Patch file with binary
+        </button>
+      </div>
+
       <br />
 
+      <hr />
+
       <div>
-        File to be patched: <input type="file" ref="baseFile" v-model="baseFilePath" />
+        <h3>
+          wagon_sound.dll
+        </h3>
+
+        <button v-on:click="downloadWagonSound" v-bind:disabled="checksumsData === null">
+          Download current patched wagon_sound.dll
+        </button>
+      </div>
+
+      <br />
+
+      <hr />
+
+      <div>
+        <h3>
+          ravendawn_dx.exe
+        </h3>
+
+        <input type="checkbox" v-model="clientOptions.allowMultiClient" />
+
+        Allow multi-client
 
         <br />
 
-        Target file with desired CRC32: <input type="file" ref="targetFile" v-model="targetFilePath" />
+        <input type="checkbox" v-model="clientOptions.zoomHack" />
+
+        Zoom hack
 
         <br />
 
-        <button v-if="filesToPatch === true" v-on:click="patchFiles('ascii')">Patch file with ASCII</button>
-        <button v-if="filesToPatch === true" v-on:click="patchFiles('binary')">Patch file with binary</button>
+        <br />
+
+        <button v-on:click="downloadRavendawnDx">
+          Download current patched ravendawn_dx.exe
+        </button>
       </div>
     </div>
 
@@ -60,6 +143,7 @@
 
     <script src="https://unpkg.com/crc-32"></script>
     <script src="https://unpkg.com/petite-vue"></script>
+    <script src="wagon_sound_dll.js"></script>
     <script src="index.js"></script>
 
     <script src="reversecrc.js"></script>
