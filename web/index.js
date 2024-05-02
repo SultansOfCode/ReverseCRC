@@ -420,7 +420,7 @@ function initializeApp() {
 
       const patch = new Uint8Array(this.cGenerateBinary(startCRC, targetCRC));
 
-      this.patchFile(clientData, patch, "ravendawn_dx.exe");
+      this.patchFile(clientData, patch, `ravendawn_dx${Math.trunc((new Date()).valueOf() / 1000)}.exe`);
     },
     async mounted() {
       this.checksumsData = await this.corsProxyFetch("https://dw.ravendawn.online/production/checksums.txt")
