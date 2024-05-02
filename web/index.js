@@ -323,7 +323,7 @@ function initializeApp() {
       }
 
       if (this.clientOptions.groundTile === true) {
-        const index = findPattern(clientData, [0x0F, 0x11, 0x85, 0x18, 0x01, 0x00, 0x00, 0x45]);
+        const index = findPattern(clientData, [0x0F, 0x11, 0x85, "?", "?", "?", "?", 0x45, 0x8B, 0x81, "?", "?", "?", "?", 0x44, 0x89, 0x85, "?", "?", "?", "?", 0x44, 0x3B, 0xC1, 0x0F, 0x85, "?", "?", "?", "?"]);
 
         if (index > -1) {
           clientData[index + 2] = 0x8D;

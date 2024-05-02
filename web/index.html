@@ -121,13 +121,13 @@
 
         <input type="checkbox" v-model="clientOptions.caveLight" />
 
-        Cave light hack
+        Cave light hack (Credits: evoked1000)
 
         <br />
 
         <input type="checkbox" v-model="clientOptions.groundTile" />
 
-        Remove ground tile
+        Remove ground tile (Credits: evoked1000)
 
         <br />
 
@@ -145,7 +145,7 @@
 
         <br />
 
-        <button v-on:click="downloadRavendawnDx">
+        <button v-on:click="downloadRavendawnDx" v-bind:disabled="checksumsData === null">
           Download current patched ravendawn_dx.exe
         </button>
       </div>
