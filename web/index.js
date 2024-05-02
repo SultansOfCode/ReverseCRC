@@ -42,8 +42,11 @@ function initializeApp() {
     targetFilePath: null,
     checksumsData: null,
     clientOptions: {
-      allowMultiClient: false,
-      zoomHack: false
+      caveLight: false,
+      groundTile: false,
+      multiClient: false,
+      worldLight: false,
+      zoom: false
     },
     cGenerateAscii: Module.generateAscii,
     cGenerateBinary: Module.generateBinary,
@@ -297,16 +300,60 @@ function initializeApp() {
         return;
       }
 
-      if (this.clientOptions.allowMultiClient === true) {
+      if (this.clientOptions.multiClient === true) {
         const index = findPattern(clientData, [0xFF, 0x15, "?", "?", "?", "?", 0xFF, 0x15, "?", "?", "?", "?", 0x3D, 0xB7, 0x00, 0x00, 0x00, 0x0F, 0x85, "?", "?", "?", "?"]);
 
         if (index > -1) {
           clientData[index + 13] = 0x28;
         }
+        else {
+          console.log("[MULTI CLIENT] Address failed");
+        }
       }
 
-      if (this.clientOptions.zoomHack === true) {
-        const index = findPattern(clientData, "\x4C\x8B\xD1\xC6\x81?????\x8B\x02\x89\x41?\x8B\x42?\x89\x41?\x44\x8B\x02\x44\x8B\x4A?");
+      if (this.clientOptions.caveLight === true) {
+        const index = findPattern(clientData, [0xF3, 0x0F, 0x11, 0x45, "?", 0xF3, 0x0F, 0x11, 0x55, "?", 0xF3, 0x0F, 0x58, 0xC8, 0xF3, 0x0F, 0x5C, 0xCE, 0xF3, 0x0F, 0x11, 0x4D, "?", 0xF3, 0x0F, 0x58, 0xDA, 0xF3, 0x0F, 0x5C, 0xDE, 0xF3, 0x0F, 0x11, 0x5D, "?", 0x80, 0x7D, "?", 0x00, 0x74, "?"]);
+
+        if (index > -1) {
+          clientData[index + 3] = 0x4D;
+        }
+        else {
+          console.log("[CAVE LIGHT] Address failed");
+        }
+      }
+
+      if (this.clientOptions.groundTile === true) {
+        const index = findPattern(clientData, [0x0F, 0x11, 0x85, 0x18, 0x01, 0x00, 0x00, 0x45]);
+
+        if (index > -1) {
+          clientData[index + 2] = 0x8D;
+        }
+        else {
+          console.log("[GROUND TILE] Address failed");
+        }
+      }
+
+      if (this.clientOptions.worldLight === true) {
+        const index = findPattern(clientData, [0x8B, 0x45, 0xB0, 0x89, 0x05, "?", "?", "?", "?", 0x8B, 0x45, 0xB4, 0x89, 0x05, "?", "?", "?", "?", 0x0F, 0xB6, 0x45, 0xB8, 0x88, 0x05, "?", "?", "?", "?", 0x0F, 0xB6, 0x45, 0xB9, 0x88, 0x05, "?", "?", "?", "?"]);
+
+        if (index > -1) {
+          clientData[index + 18] = 0xB0;
+          clientData[index + 19] = 0xD7;
+          clientData[index + 20] = 0x90;
+          clientData[index + 21] = 0x90;
+
+          clientData[index + 28] = 0xB0;
+          clientData[index + 29] = 0xFF;
+          clientData[index + 30] = 0x90;
+          clientData[index + 31] = 0x90;
+        }
+        else {
+          console.log("[WORLD LIGHT] Address failed");
+        }
+      }
+
+      if (this.clientOptions.zoom === true) {
+        const index = findPattern(clientData, [0x4C, 0x8B, 0xD1, 0xC6, 0x81, "?", "?", "?", "?", "?", 0x8B, 0x02, 0x89, 0x41, "?", 0x8B, 0x42, "?", 0x89, 0x41, "?", 0x44, 0x8B, 0x02, 0x44, 0x8B, 0x4A, "?"]);
 
         if (index > -1) {
           const codeCaveIndex = findPattern(clientData, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], index);
@@ -360,11 +407,11 @@ function initializeApp() {
             clientData[codeCaveIndex + 27] = (diffBack >> 24) & 0xFF;
           }
           else {
-            console.log("[ZOOM HACK] Code cave failed");
+            console.log("[ZOOM] Code cave failed");
           }
         }
         else {
-          console.log("[ZOOM HACK] Address failed");
+          console.log("[ZOOM] Address failed");
         }
       }
 

@@ -113,13 +113,31 @@
           ravendawn_dx.exe
         </h3>
 
-        <input type="checkbox" v-model="clientOptions.allowMultiClient" />
+        <input type="checkbox" v-model="clientOptions.multiClient" />
 
-        Allow multi-client
+        Allow multi client
 
         <br />
 
-        <input type="checkbox" v-model="clientOptions.zoomHack" />
+        <input type="checkbox" v-model="clientOptions.caveLight" />
+
+        Cave light hack
+
+        <br />
+
+        <input type="checkbox" v-model="clientOptions.groundTile" />
+
+        Remove ground tile
+
+        <br />
+
+        <input type="checkbox" v-model="clientOptions.worldLight" />
+
+        World light hack
+
+        <br />
+
+        <input type="checkbox" v-model="clientOptions.zoom" />
 
         Zoom hack
 
