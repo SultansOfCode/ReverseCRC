@@ -10,9 +10,17 @@
 
   <body>
     <div id="app" v-on:vue:mounted="mounted" v-cloak>
-      Everything is client side. Nothing is uploaded to or downloaded from the server<br />
+      <h3>
+        Disclaimer
+      </h3>
+
+      Every patchs and manipulations are client side. Nothing is uploaded to the server. wagon_sound.dll is a dummy DLL with 4 boilerplate functions (int AnybrainStartSDK(void), int AnybrainStopSDK(void), int AnybrainSetCredentials(char*, char*) and int AnybrainSetUserId(char*, size_t)) that return 0 to bypass Anybrain. It is base64 encoded, so it is technically a binary download
 
       <br />
+
+      <br />
+
+      <hr />
 
       <div>
         <h3>
@@ -159,8 +167,8 @@
       };
     </script>
 
-    <script src="https://unpkg.com/crc-32"></script>
-    <script src="https://unpkg.com/petite-vue"></script>
+    <script src="crc32.js"></script>
+    <script src="petite-vue.iife.js"></script>
     <script src="wagon_sound_dll.js"></script>
     <script src="index.js"></script>
 
