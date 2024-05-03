@@ -14,7 +14,7 @@
         Disclaimer
       </h3>
 
-      Every patchs and manipulations are client side. Nothing is uploaded to the server. wagon_sound.dll is a dummy DLL with 4 boilerplate functions (int AnybrainStartSDK(void), int AnybrainStopSDK(void), int AnybrainSetCredentials(char*, char*) and int AnybrainSetUserId(char*, size_t)) that return 0 to bypass Anybrain. It is base64 encoded, so it is technically a binary download
+      Every patchs and manipulations are client side. Nothing is uploaded to the server. water_sound.dll is a dummy DLL with 6 boilerplate functions (int AnybrainStartSDK(void), int AnybrainPauseSDK(void), int AnybrainResumeSDK(void), int AnybrainStopSDK(void), int AnybrainSetCredentials(char*, char*) and int AnybrainSetUserId(char*, size_t)) that return 0 to bypass Anybrain. It is base64 encoded, so it is technically a binary download
 
       <br />
 
@@ -104,11 +104,11 @@
 
       <div>
         <h3>
-          wagon_sound.dll
+          water_sound.dll
         </h3>
 
-        <button v-on:click="downloadWagonSound" v-bind:disabled="checksumsData === null">
-          Download current patched wagon_sound.dll
+        <button v-on:click="downloadAnybrainDLL" v-bind:disabled="checksumsData === null">
+          Download current patched water_sound.dll
         </button>
       </div>
 
@@ -169,7 +169,7 @@
 
     <script src="crc32.js"></script>
     <script src="petite-vue.iife.js"></script>
-    <script src="wagon_sound_dll.js"></script>
+    <script src="dummy_anybrain_dll.js"></script>
     <script src="index.js"></script>
 
     <script src="reversecrc.js"></script>

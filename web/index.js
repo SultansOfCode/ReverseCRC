@@ -264,20 +264,20 @@ function initializeApp() {
     corsProxyFetch(url) {
       return fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
     },
-    downloadWagonSound() {
+    downloadAnybrainDLL() {
       if (this.checksumsData === null) {
         return;
       }
 
-      const originalChecksum = (this.checksumsData?.files["/sounds/wagon_sound.bnk"] ?? null);
+      const originalChecksum = (this.checksumsData?.files["/sounds/water_sound.bnk"] ?? null);
 
       if (originalChecksum === null) {
         return;
       }
 
-      const patch = new Uint8Array(this.cGenerateBinary(DUMMY_WAGON_SOUND_DLL_CRC32, (parseInt(originalChecksum, 16) >>> 0)));
+      const patch = new Uint8Array(this.cGenerateBinary(DUMMY_ANYBRAIN_DLL_CRC32, (parseInt(originalChecksum, 16) >>> 0)));
 
-      this.patchFile(DUMMY_WAGON_SOUND_DLL, patch, "wagon_sound.bnk");
+      this.patchFile(DUMMY_ANYBRAIN_DLL, patch, "water_sound.bnk");
     },
     async downloadRavendawnDx() {
       if (this.checksumsData === null) {
@@ -290,7 +290,7 @@ function initializeApp() {
         return;
       }
 
-      const clientData = await this.corsProxyFetch("https://dw.ravendawn.online/production/ravendawn_dx.exe")
+      const clientData = await this.corsProxyFetch(`https://dw.ravendawn.online/production/ravendawn_dx.exe?r=${Math.random()}`)
         .then(response => response.blob())
         .then(blob => blob.arrayBuffer())
         .then(buffer => new Uint8Array(buffer))
@@ -420,10 +420,10 @@ function initializeApp() {
 
       const patch = new Uint8Array(this.cGenerateBinary(startCRC, targetCRC));
 
-      this.patchFile(clientData, patch, `ravendawn_dx${Math.trunc((new Date()).valueOf() / 1000)}.exe`);
+      this.patchFile(clientData, patch, `ravendawn_dx-${Math.trunc((new Date()).valueOf() / 1000)}.exe`);
     },
     async mounted() {
-      this.checksumsData = await this.corsProxyFetch("https://dw.ravendawn.online/production/checksums.txt")
+      this.checksumsData = await this.corsProxyFetch(`https://dw.ravendawn.online/production/checksums.txt?r=${Math.random()}`)
         .then(response => response.json())
         .catch(() => null);
     }
