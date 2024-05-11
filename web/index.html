@@ -104,11 +104,25 @@
 
       <div>
         <h3>
-          water_sound.dll
+          wagon_sound.dll
         </h3>
 
-        <button v-on:click="downloadAnybrainDLL" v-bind:disabled="checksumsData === null">
-          Download current patched water_sound.dll
+        <button v-on:click="downloadAnybrainDLL('wagon_sound.bnk')" v-bind:disabled="checksumsData === null">
+          Download current patched wagon_sound.bnk
+        </button>
+      </div>
+
+      <br />
+
+      <hr />
+
+      <div>
+        <h3>
+          water_sound.bnk
+        </h3>
+
+        <button v-on:click="downloadAnybrainDLL('water_sound.bnk')" v-bind:disabled="checksumsData === null">
+          Download current patched water_sound.bnk
         </button>
       </div>
 

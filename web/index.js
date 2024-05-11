@@ -264,12 +264,12 @@ function initializeApp() {
     corsProxyFetch(url) {
       return fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
     },
-    downloadAnybrainDLL() {
+    downloadAnybrainDLL(fileName) {
       if (this.checksumsData === null) {
         return;
       }
 
-      const originalChecksum = (this.checksumsData?.files["/sounds/water_sound.bnk"] ?? null);
+      const originalChecksum = (this.checksumsData?.files[`/sounds/${fileName}`] ?? null);
 
       if (originalChecksum === null) {
         return;
@@ -277,7 +277,7 @@ function initializeApp() {
 
       const patch = new Uint8Array(this.cGenerateBinary(DUMMY_ANYBRAIN_DLL_CRC32, (parseInt(originalChecksum, 16) >>> 0)));
 
-      this.patchFile(DUMMY_ANYBRAIN_DLL, patch, "water_sound.bnk");
+      this.patchFile(DUMMY_ANYBRAIN_DLL, patch, fileName);
     },
     async downloadRavendawnDx() {
       if (this.checksumsData === null) {
