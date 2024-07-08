@@ -41,7 +41,7 @@ function initializeApp() {
     baseFilePath: null,
     targetFilePath: null,
     checksumsData: null,
-    dummyDllName: "anybrain_dummy.dll",
+    dummyDllName: DUMMY_ANYBRAIN_NAME,
     clientOptions: {
       caveLight: false,
       groundTile: false,
