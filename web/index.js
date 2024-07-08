@@ -270,19 +270,19 @@ function initializeApp() {
         return;
       }
 
+      let fileName = this.dummyDllName;
+
+      if (fileName.length === 0) {
+        fileName = DUMMY_ANYBRAIN_NAME;
+      }
+      else if (fileName.indexOf(".") === -1) {
+        fileName += ".bnk";
+      }
+
       const originalChecksum = (this.checksumsData?.files[`/sounds/${fileName}`] ?? null);
 
       if (originalChecksum === null) {
         return;
-      }
-
-      let fileName = this.dummyDllName;
-
-      if (fileName.length === 0) {
-        fileName = "dummy_anybrain.dll";
-      }
-      else if (fileName.indexOf(".") === -1) {
-        fileName += ".dll";
       }
 
       const patch = new Uint8Array(this.cGenerateBinary(DUMMY_ANYBRAIN_DLL_CRC32, (parseInt(originalChecksum, 16) >>> 0)));
@@ -293,9 +293,10 @@ function initializeApp() {
       let fileName = this.dummyDllName;
 
       if (fileName.length === 0) {
-        fileName = "dummy_anybrain.ini";
+        fileName = DUMMY_ANYBRAIN_NAME;
       }
-      else if (fileName.indexOf(".") === -1) {
+
+      if (fileName.indexOf(".") === -1) {
         fileName += ".ini";
       }
       else {
