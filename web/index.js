@@ -41,6 +41,7 @@ function initializeApp() {
     baseFilePath: null,
     targetFilePath: null,
     checksumsData: null,
+    dummyDllName: "anybrain_dummy.dll",
     clientOptions: {
       caveLight: false,
       groundTile: false,
@@ -264,7 +265,7 @@ function initializeApp() {
     corsProxyFetch(url) {
       return fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
     },
-    downloadAnybrainDLL(fileName) {
+    downloadAnybrainDLL() {
       if (this.checksumsData === null) {
         return;
       }
@@ -273,6 +274,12 @@ function initializeApp() {
 
       if (originalChecksum === null) {
         return;
+      }
+
+      let fileName = this.dummyDllName;
+
+      if (fileName.indexOf(".") === -1) {
+        fileName += ".dll";
       }
 
       const patch = new Uint8Array(this.cGenerateBinary(DUMMY_ANYBRAIN_DLL_CRC32, (parseInt(originalChecksum, 16) >>> 0)));
