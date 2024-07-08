@@ -104,10 +104,12 @@
 
       <div>
         <h3>
-          wooby_sound.bnk
+          Dummy Anybrain DLL
         </h3>
 
-        <button v-on:click="downloadAnybrainDLL('wooby_sound.bnk')" v-bind:disabled="checksumsData === null">
+        Type the file name: <input type="text" v-model="dummyDllName" />
+
+        <button v-on:click="downloadAnybrainDLL()" v-bind:disabled="checksumsData === null">
           Download current patched wooby_sound.bnk
         </button>
       </div>
