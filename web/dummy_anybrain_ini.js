@@ -1,0 +1,7 @@
+const DUMMY_ANYBRAIN_INI = new Uint8Array(
+  atob(
+    "W2NvbmZpZ10NCnNraXBBbnlicmFpblN0YXJ0U0RLPTANCnNraXBBbnlicmFpblBhdXNlU0RLPTANCnNraXBBbnlicmFpblJlc3VtZVNESz0wDQpza2lwQW55YnJhaW5TdG9wU0RLPTANCnNraXBBbnlicmFpblNldENyZWRlbnRpYWxzPTANCnNraXBBbnlicmFpblNldFVzZXJJZD0wDQpmYWtlQW55YnJhaW5TZXRDcmVkZW50aWFscz0wDQpmYWtlQW55YnJhaW5TZXRDcmVkZW50aWFsc0FyZzA9PHN0cmluZz4NCmZha2VBbnlicmFpblNldENyZWRlbnRpYWxzQXJnMT08c3RyaW5nPg0KZmFrZUFueWJyYWluU2V0VXNlcklkPTANCmZha2VBbnlicmFpblNldFVzZXJJZEFyZzA9PHN0cmluZz4NCg=="
+  )
+  .split("")
+  .map(c => c.charCodeAt(0))
+);
