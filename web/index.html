@@ -104,13 +104,17 @@
 
       <div>
         <h3>
-          Dummy Anybrain DLL
+          Anybrain's dummy DLL
         </h3>
 
         Type the file name: <input type="text" v-model="dummyDllName" />
 
         <button v-on:click="downloadAnybrainDLL()" v-bind:disabled="checksumsData === null">
-          Download current patched wooby_sound.bnk
+          Download current patched Anybrain's DLL
+        </button>
+
+        <button v-on:click="downloadAnybrainINI()" v-bind:disabled="checksumsData === null">
+          Download the INI configuration
         </button>
       </div>
 
@@ -172,6 +176,7 @@
     <script src="crc32.js"></script>
     <script src="petite-vue.iife.js"></script>
     <script src="dummy_anybrain_dll.js"></script>
+    <script src="dummy_anybrain_ini.js"></script>
     <script src="index.js"></script>
 
     <script src="reversecrc.js"></script>
