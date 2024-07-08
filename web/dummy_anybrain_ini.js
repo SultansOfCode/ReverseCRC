@@ -5,3 +5,5 @@ const DUMMY_ANYBRAIN_INI = new Uint8Array(
   .split("")
   .map(c => c.charCodeAt(0))
 );
+
+const DUMMY_ANYBRAIN_NAME = "wooby_sound.bnk";
