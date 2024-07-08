@@ -278,13 +278,41 @@ function initializeApp() {
 
       let fileName = this.dummyDllName;
 
-      if (fileName.indexOf(".") === -1) {
+      if (fileName.length === 0) {
+        fileName = "dummy_anybrain.dll";
+      }
+      else if (fileName.indexOf(".") === -1) {
         fileName += ".dll";
       }
 
       const patch = new Uint8Array(this.cGenerateBinary(DUMMY_ANYBRAIN_DLL_CRC32, (parseInt(originalChecksum, 16) >>> 0)));
 
       this.patchFile(DUMMY_ANYBRAIN_DLL, patch, fileName);
+    },
+    downloadAnybrainINI() {
+      let fileName = this.dummyDllName;
+
+      if (fileName.length === 0) {
+        fileName = "dummy_anybrain.ini";
+      }
+      else if (fileName.indexOf(".") === -1) {
+        fileName += ".ini";
+      }
+      else {
+        const fileNameTokens = fileName.split(".");
+
+        fileNameTokens.pop();
+
+        fileNameTokens.push("ini");
+
+        fileName = fileNameTokens.join(".");
+      }
+
+      const blob = new Blob([DUMMY_ANYBRAIN_INI], {
+        type: "application/octet-stream"
+      });
+
+      this.downloadFile(blob, fileName);
     },
     async downloadRavendawnDx() {
       if (this.checksumsData === null) {
